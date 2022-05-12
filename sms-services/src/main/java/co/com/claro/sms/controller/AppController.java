@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import co.com.claro.sms.dto.RequestDTO;
+import co.com.claro.sms.dto.RequestDecriptDTO;
 import co.com.claro.sms.entity.Log;
 import co.com.claro.sms.service.LogService;
 import co.com.claro.sms.services.SMSServices;
@@ -25,7 +26,7 @@ public class AppController {
 
 	@Autowired
 	private SMSServices services;
-	
+
 	@Autowired
 	private LogService logService;
 
@@ -33,15 +34,16 @@ public class AppController {
 	public void send(@RequestBody RequestDTO request) {
 
 		log.info("[[START]] request: {}", request);
-	
+
 		if (request == null || request.getPhone() == null) {
 			throw new RuntimeException("Telefono invalido");
 		}
-		
-		if (request == null || request.getMessage() == null || request.getMessage().isBlank() || request.getMessage().length() > 150) {
+
+		if (request == null || request.getMessage() == null || request.getMessage().isBlank()
+				|| request.getMessage().length() > 150) {
 			throw new RuntimeException("Mensaje invalido");
 		}
-		
+
 		services.sendSMS(request);
 
 	}
@@ -53,15 +55,15 @@ public class AppController {
 
 	}
 
-	@GetMapping("/sms/decript")
-	public Map<String, String> decript(@RequestHeader("token") String token) {
+	@PostMapping("/sms/decript")
+	public Map<String, String> decript(@RequestBody RequestDecriptDTO requestDecript) {
 
-		return services.decript(token);
-		
+		return services.decript(requestDecript.getToken());
+
 	}
-	
+
 	@GetMapping("/log")
-	public List<Log> findByDate(){
+	public List<Log> findByDate() {
 		return logService.findByDate();
 	}
 
