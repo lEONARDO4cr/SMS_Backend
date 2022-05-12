@@ -1,8 +1,6 @@
 package co.com.claro.sms.services;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -91,7 +89,7 @@ public class SMSServices {
 
 	}
 
-	public Map<String, String> decript(String token) {
+	public String decript(String token) {
 
 		String key = generateKey();
 		return tokenToMap(token, key);
@@ -160,33 +158,19 @@ public class SMSServices {
 		return null;
 	}
 
-	private Map<String, String> tokenToMap(String token, String key) {
-
-		Map<String, String> mapParameters = new HashMap<>();
+	private String tokenToMap(String token, String key) {
 
 		try {
 
 			final String desencriptado = AESUtil.decrypt(token, key);
+			log.info("Token decriptado: {}", desencriptado);
 
-			if (desencriptado == null || desencriptado.isEmpty()) {
-				throw new RuntimeException(INVALID_TOKEN);
-			}
-
-			final String[] arrOfStr = desencriptado.split("&");
-
-			for (int i = 0; i < arrOfStr.length; i++) {
-				if (arrOfStr[i].split("=").length == 1) {
-					throw new RuntimeException(
-							"Error:" + String.format(MISSING_VALUE_ERROR2, arrOfStr[i].split("=")[0]));
-				}
-				mapParameters.put(arrOfStr[i].split("=")[0], arrOfStr[i].split("=")[1]);
-			}
+			return desencriptado;
 
 		} catch (final Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
 
-		return mapParameters;
 	}
 
 }

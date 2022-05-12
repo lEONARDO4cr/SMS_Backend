@@ -1,18 +1,20 @@
 package co.com.claro.sms.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import co.com.claro.sms.dto.RequestDTO;
 import co.com.claro.sms.dto.RequestDecriptDTO;
+import co.com.claro.sms.dto.RequestEncriptTokenDTO;
 import co.com.claro.sms.entity.Log;
 import co.com.claro.sms.service.LogService;
 import co.com.claro.sms.services.SMSServices;
@@ -48,15 +50,20 @@ public class AppController {
 
 	}
 
-	@GetMapping("/sms/encript")
-	public String encript(@RequestHeader("data") String data, @RequestHeader("key") String key) throws Exception {
+	@PostMapping("/sms/encript")
+	public String encript(@RequestBody RequestEncriptTokenDTO encriptTokenDTO) throws Exception {
 
-		return AESUtil.encrypt(data, key);
+		log.info("[[START]] encriptTokenDTO: {}", encriptTokenDTO);
+
+		String data = new ObjectMapper().writeValueAsString(encriptTokenDTO.getData());
+		log.info("data: {}", data);
+
+		return AESUtil.encrypt(data, encriptTokenDTO.getKey());
 
 	}
 
-	@PostMapping("/sms/decript")
-	public Map<String, String> decript(@RequestBody RequestDecriptDTO requestDecript) {
+	@PostMapping(path = "/sms/decript", produces = MediaType.APPLICATION_JSON_VALUE)
+	public String decript(@RequestBody RequestDecriptDTO requestDecript) {
 
 		return services.decript(requestDecript.getToken());
 
