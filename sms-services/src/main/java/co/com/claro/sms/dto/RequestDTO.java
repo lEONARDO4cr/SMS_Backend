@@ -1,6 +1,7 @@
 package co.com.claro.sms.dto;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import co.com.claro.sms.dto.enums.TypeDocument;
 import lombok.Data;
@@ -25,6 +26,6 @@ public class RequestDTO implements Serializable {
 	private String asesorName;
 	private String asesorSignum;
 
-	private String biHeaderId;
+	private Map<String, Object> bi;
 
 }
