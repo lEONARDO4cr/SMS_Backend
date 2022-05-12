@@ -36,7 +36,7 @@ public class SMSServices {
 	public static final String MISSING_VALUE_ERROR = "Hace falta el parametro '%s' en la url de inicio";
 	public static final String MISSING_VALUE_ERROR2 = "Hace falta el valor para el parametro '%s' en la url de inicio";
 
-	@Value("${token.key:MICLAROA}")
+	@Value("${token.key:SMSEMAIL}")
 	private String tokenKey;
 
 	@Autowired
