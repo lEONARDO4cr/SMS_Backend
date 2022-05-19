@@ -35,6 +35,7 @@ public class AppController {
 	@Autowired
 	private LogService logService;
 
+	@CrossOrigin
 	@PostMapping("/sms/send")
 	public void send(@RequestBody RequestDTO request) throws JsonProcessingException {
 
@@ -53,6 +54,7 @@ public class AppController {
 
 	}
 
+	@CrossOrigin
 	@PostMapping("/sms/encript")
 	public String encript(@RequestBody RequestEncriptTokenDTO encriptTokenDTO) throws Exception {
 
@@ -61,10 +63,14 @@ public class AppController {
 		String data = new ObjectMapper().writeValueAsString(encriptTokenDTO.getData());
 		log.info("data: {}", data);
 
-		return AESUtil.encrypt(data, encriptTokenDTO.getKey());
+		String encrypt = AESUtil.encrypt(data, encriptTokenDTO.getKey());
+		log.info("encrypt: {}", encrypt);
+
+		return encrypt;
 
 	}
 
+	@CrossOrigin
 	@PostMapping(path = "/sms/decript", produces = MediaType.APPLICATION_JSON_VALUE)
 	public String decript(@RequestBody RequestDecriptDTO requestDecript) {
 
@@ -72,6 +78,7 @@ public class AppController {
 
 	}
 
+	@CrossOrigin
 	@GetMapping("/log")
 	public List<Log> findByDate() {
 		return logService.findByDate();
