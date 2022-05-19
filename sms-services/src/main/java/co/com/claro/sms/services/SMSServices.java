@@ -11,8 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import brave.Tracer;
+import co.com.claro.sms.client.BIClient;
 import co.com.claro.sms.dto.RequestDTO;
 import co.com.claro.sms.dto.ResponseDTO;
 import co.com.claro.sms.dto.sms.notification.HeaderRequest;
@@ -46,12 +48,24 @@ public class SMSServices {
 	@Autowired
 	private LogService logService;
 
-	public ResponseDTO sendSMS(RequestDTO request) {
+	@Autowired
+	private BIClient biClient;
+
+	public ResponseDTO sendSMS(RequestDTO request) throws JsonProcessingException {
 
 		log.info("[[START]] decriptToken: {}", request);
 
 		sendSMS(request.getPhone(), request.getMessage());
 		insertLog(request);
+
+		if (request.getBi() != null) {
+
+			String message = new ObjectMapper().writeValueAsString(request.getBi());
+			log.info("JSON:....{}", message);
+
+//			biClient.createHeader(message);
+
+		}
 
 		return new ResponseDTO();
 	}
