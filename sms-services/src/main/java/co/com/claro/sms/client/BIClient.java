@@ -1,17 +1,20 @@
 package co.com.claro.sms.client;
 
 import java.util.Date;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import co.com.claro.sms.dto.bi.HeaderRequestBiDTO;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import co.com.claro.sms.dto.sms.notification.SMSResponse;
 import co.com.claro.sms.util.Util;
 
 @Service
@@ -34,24 +37,17 @@ public class BIClient {
 
 	private static final Logger log = LoggerFactory.getLogger(BIClient.class);
 
-	public void createHeader(String message, Map<String, Object> bi) {
+	public void createHeader(String message) throws JsonProcessingException {
 
-		HeaderRequestBiDTO request = new HeaderRequestBiDTO();
-		request.setGetOperation(operation);
+		String url = "http://100.126.21.189:7777/BIZInteractions/Rest/V1.0/BizInteractionsApi/put/";
 
-		request.setSystem(system);
+		url = url + "setPresencialBizInteraction/";
 
-		request.setUser(user);
+		log.info("url: {}", url);
 
-		request.setPassword(password);
+		url += message;
 
-		// 2020-02-25T16:39:28.781
-		String requestDate = Util.dateToString(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSS");
-		request.setRequestDate(requestDate);
-
-		request.setMessage(message);
-
-		String url = "http://100.126.21.189:7777/BIZInteractions/Rest/V1.0/BizInteractionsApi/put/setPresencialBizInteraction/";
+		log.info("url: {}", url);
 
 		UriComponentsBuilder ureBuilder = UriComponentsBuilder.fromHttpUrl(url);
 
@@ -61,15 +57,15 @@ public class BIClient {
 
 		ureBuilder.queryParam("password", password);
 
+		// 2020-02-25T16:39:28.781
+		String requestDate = Util.dateToString(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSS");
 		ureBuilder.queryParam("requestDate", requestDate);
 
-		log.info("url: {}", ureBuilder.toUriString());
+		log.info("url: {}", ureBuilder.build().encode().toUri());
 
-//		HttpEntity<HeaderRequestBiDTO> httpEntity = new HttpEntity<>(request);
-//		ResponseEntity<SMSResponse> responseSMS = restTemplate.exchange(
-//				"http://100.126.21.189:7777/BIZInteractions/Rest/V1.0/BizInteractionsApi/put?system=Vista360&user=user1&password=passwor",
-//				HttpMethod.PUT, httpEntity, SMSResponse.class);
-//		log.info("responseBI: {}", responseSMS.getBody());
+		ResponseEntity<SMSResponse> responseSMS = restTemplate.exchange(ureBuilder.build().encode().toUri(),
+				HttpMethod.PUT, null, SMSResponse.class);
+		log.info("responseBI: {}", responseSMS.getBody());
 
 	}
 
