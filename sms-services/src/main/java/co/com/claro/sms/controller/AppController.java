@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,9 +25,9 @@ import co.com.claro.sms.util.AESUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@CrossOrigin
 @RestController
 @RequestMapping("/api/v1")
-@CrossOrigin
 public class AppController {
 
 	@Autowired
@@ -41,16 +42,24 @@ public class AppController {
 
 		log.info("[[START]] request: {}", request);
 
-		if (request == null || request.getPhone() == null) {
-			throw new RuntimeException("Telefono invalido");
-		}
+		final var watch = new StopWatch();
+		watch.start();
 
-		if (request == null || request.getMessage() == null || request.getMessage().isBlank()
-				|| request.getMessage().length() > 150) {
-			throw new RuntimeException("Mensaje invalido");
-		}
+		try {
 
-		services.sendSMS(request);
+			if (request == null || request.getPhone() == null)
+				throw new RuntimeException("Telefono invalido");
+
+			if (request == null || request.getMessage() == null || request.getMessage().isBlank()
+					|| request.getMessage().length() > 150)
+				throw new RuntimeException("Mensaje invalido");
+
+			services.sendSMS(request);
+
+		} finally {
+			watch.stop();
+			log.info("[[END]] el servicio tardo: {}", watch.getTotalTimeMillis());
+		}
 
 	}
 
@@ -60,10 +69,10 @@ public class AppController {
 
 		log.info("[[START]] encriptTokenDTO: {}", encriptTokenDTO);
 
-		String data = new ObjectMapper().writeValueAsString(encriptTokenDTO.getData());
+		final var data = new ObjectMapper().writeValueAsString(encriptTokenDTO.getData());
 		log.info("data: {}", data);
 
-		String encrypt = AESUtil.encrypt(data, encriptTokenDTO.getKey());
+		final var encrypt = AESUtil.encrypt(data, encriptTokenDTO.getKey());
 		log.info("encrypt: {}", encrypt);
 
 		return encrypt;

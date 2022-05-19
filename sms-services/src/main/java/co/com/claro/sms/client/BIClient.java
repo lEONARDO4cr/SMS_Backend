@@ -8,11 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import co.com.claro.sms.dto.sms.notification.SMSResponse;
 import co.com.claro.sms.util.Util;
@@ -32,40 +35,62 @@ public class BIClient {
 	@Value("${clientBi.password.default.value:password1}")
 	private String password;
 
+	@Value("${clientBi.url:http://100.126.21.189:7777/BIZInteractions/Rest/V1.0/BizInteractionsApi/put/}")
+	private String url;
+
 	@Autowired
 	private RestTemplate restTemplate;
 
 	private static final Logger log = LoggerFactory.getLogger(BIClient.class);
 
-	public void createHeader(String message) throws JsonProcessingException {
+	@Async
+	@Retryable(value = { Exception.class }, maxAttempts = 2, backoff = @Backoff(1000))
+	public void createHeader(String message) {
 
-		String url = "http://100.126.21.189:7777/BIZInteractions/Rest/V1.0/BizInteractionsApi/put/";
+		final var watch = new StopWatch();
+		watch.start();
 
-		url = url + "setPresencialBizInteraction/";
+		log.info("[[Start]] createHeader");
 
-		log.info("url: {}", url);
+		try {
 
-		url += message;
+			url = url + operation + "/" + message;
 
-		log.info("url: {}", url);
+			log.trace("path url: {}", url);
 
-		UriComponentsBuilder ureBuilder = UriComponentsBuilder.fromHttpUrl(url);
+			final var ureBuilder = UriComponentsBuilder.fromHttpUrl(url);
 
-		ureBuilder.queryParam("system", system);
+			ureBuilder.queryParam("system", system);
 
-		ureBuilder.queryParam("user", user);
+			ureBuilder.queryParam("user", user);
 
-		ureBuilder.queryParam("password", password);
+			ureBuilder.queryParam("password", password);
 
-		// 2020-02-25T16:39:28.781
-		String requestDate = Util.dateToString(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSS");
-		ureBuilder.queryParam("requestDate", requestDate);
+			// 2020-02-25T16:39:28.781
+			final var requestDate = Util.dateToString(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSS");
+			ureBuilder.queryParam("requestDate", requestDate);
 
-		log.info("url: {}", ureBuilder.build().encode().toUri());
+			log.debug("encode url: {}", ureBuilder.build().encode().toUri());
 
-		ResponseEntity<SMSResponse> responseSMS = restTemplate.exchange(ureBuilder.build().encode().toUri(),
-				HttpMethod.PUT, null, SMSResponse.class);
-		log.info("responseBI: {}", responseSMS.getBody());
+			final ResponseEntity<SMSResponse> responseSMS = restTemplate.exchange(ureBuilder.build().encode().toUri(),
+					HttpMethod.PUT, null, SMSResponse.class);
+			final var response = responseSMS.getBody();
+			log.debug("responseBI: {}", response);
+
+			if (response == null || !Boolean.valueOf(response.getIsValid()))
+				throw new RuntimeException("No se logro crear la BI");
+
+		} finally {
+			watch.stop();
+			log.info("[[end]] createHeader, el servicio tardo {} milisegundos", watch.getTotalTimeMillis());
+		}
+
+	}
+
+	@Recover
+	public void retrycreateHeader(Exception e, String message) {
+
+		log.error("createHeader Exception: {}", e.getMessage(), e);
 
 	}
 

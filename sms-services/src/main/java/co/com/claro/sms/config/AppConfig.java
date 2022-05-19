@@ -15,5 +15,5 @@ public class AppConfig {
 		return restTemplateBuilder.setConnectTimeout(Duration.ofSeconds(3L)).setReadTimeout(Duration.ofSeconds(3L))
 				.build();
 	}
-	
+
 }

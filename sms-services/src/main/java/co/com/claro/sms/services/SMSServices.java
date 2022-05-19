@@ -36,8 +36,11 @@ public class SMSServices {
 	public static final String MISSING_VALUE_ERROR = "Hace falta el parametro '%s' en la url de inicio";
 	public static final String MISSING_VALUE_ERROR2 = "Hace falta el valor para el parametro '%s' en la url de inicio";
 
-	@Value("${token.key:SMSEMAIL}")
+	@Value("${sms.token.key:SMSEMAIL}")
 	private String tokenKey;
+
+	@Value("${sms.url:http://100.126.21.189:7777/Notification/V2.0/Rest/PutMessage}")
+	private String url;
 
 	@Autowired
 	private Tracer tracer;
@@ -60,9 +63,7 @@ public class SMSServices {
 
 		if (request.getBi() != null) {
 
-			String message = new ObjectMapper().writeValueAsString(request.getBi());
-			log.info("JSON:....{}", message);
-
+			final var message = new ObjectMapper().writeValueAsString(request.getBi());
 			biClient.createHeader(message);
 
 		}
@@ -72,12 +73,11 @@ public class SMSServices {
 
 	private void sendSMS(String phone, String message) {
 
-		RequestSMS requestSMS = buildRequest(phone, message);
+		final var requestSMS = buildRequest(phone, message);
 		log.info("requestSMS: {}", requestSMS);
 
-		HttpEntity<RequestSMS> httpEntity = new HttpEntity<>(requestSMS);
-		ResponseEntity<SMSResponse> responseSMS = restTemplate.exchange(
-				"http://100.126.21.189:7777/Notification/V2.0/Rest/PutMessage", HttpMethod.PUT, httpEntity,
+		final var httpEntity = new HttpEntity<>(requestSMS);
+		final ResponseEntity<SMSResponse> responseSMS = restTemplate.exchange(url, HttpMethod.PUT, httpEntity,
 				SMSResponse.class);
 		log.info("responseSMS: {}", responseSMS.getBody());
 
@@ -85,7 +85,7 @@ public class SMSServices {
 
 	public void insertLog(RequestDTO request) {
 
-		Log auditLog = new Log();
+		final var auditLog = new Log();
 		auditLog.setAccount(request.getClientAccount());
 		auditLog.setAsesorCod(request.getAsesorCod());
 		auditLog.setAsesorDocument(request.getAsesorDocument());
@@ -98,30 +98,29 @@ public class SMSServices {
 		auditLog.setMessage(request.getMessage());
 		auditLog.setTypeDocument(request.getClientTypeDocument());
 
-		auditLog = logService.insert(auditLog);
-		log.info("auditLog: {}", auditLog);
+		logService.insert(auditLog);
 
 	}
 
 	public String decript(String token) {
 
-		String key = generateKey();
+		final var key = generateKey();
 		return tokenToMap(token, key);
 
 	}
 
 	public String generateKey() {
 
-		String date = Util.dateToString(new Date(), "yyyyMMdd");
+		final var date = Util.dateToString(new Date(), "yyyyMMdd");
 		return tokenKey + date;
 
 	}
 
 	public RequestSMS buildRequest(String phone, String message) {
 
-		RequestSMS requestSMS = new RequestSMS();
+		final var requestSMS = new RequestSMS();
 
-		HeaderRequest headerRequest = new HeaderRequest();
+		final var headerRequest = new HeaderRequest();
 		headerRequest.setIpApplication("127.0.0.1");
 		headerRequest.setPassword("system432");
 		headerRequest.setRequestDate(Util.dateToString(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSS"));
@@ -133,7 +132,7 @@ public class SMSServices {
 
 		requestSMS.setHeaderRequest(headerRequest);
 
-		MessageRequest messageRequest = new MessageRequest();
+		final var messageRequest = new MessageRequest();
 		messageRequest.setCommunicationOrigin("TCRM");
 		messageRequest.addCommunicationType("COMERCIAL");
 		messageRequest.setContentType("MESSAGE");
@@ -148,10 +147,10 @@ public class SMSServices {
 		try {
 
 			// Convertir a string
-			String jsonMessage = Util.objectToJson(messageRequest);
+			final var jsonMessage = Util.objectToJson(messageRequest);
 			requestSMS.setMessage(jsonMessage);
 
-		} catch (JsonProcessingException e) {
+		} catch (final JsonProcessingException e) {
 			log.error("JsonProcessingException: {}", e.getMessage(), e);
 		}
 
@@ -176,7 +175,7 @@ public class SMSServices {
 
 		try {
 
-			final String desencriptado = AESUtil.decrypt(token, key);
+			final var desencriptado = AESUtil.decrypt(token, key);
 			log.info("Token decriptado: {}", desencriptado);
 
 			return desencriptado;
