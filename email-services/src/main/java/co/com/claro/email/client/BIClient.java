@@ -1,4 +1,4 @@
-package co.com.claro.sms.client;
+package co.com.claro.email.client;
 
 import java.util.Date;
 
@@ -17,8 +17,8 @@ import org.springframework.util.StopWatch;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import co.com.claro.sms.dto.sms.notification.SMSResponse;
-import co.com.claro.sms.util.Util;
+import co.com.claro.email.dto.email.notification.EMAILResponse;
+import co.com.claro.email.util.Util;
 
 @Service
 public class BIClient {
@@ -44,7 +44,7 @@ public class BIClient {
 	private static final Logger log = LoggerFactory.getLogger(BIClient.class);
 
 	@Async
-	@Retryable(value = { Exception.class }, maxAttempts = 2, backoff = @Backoff(1000))
+	@Retryable(value = { Exception.class, RuntimeException.class }, maxAttempts = 2, backoff = @Backoff(1000))
 	public void createHeader(String message) {
 
 		final var watch = new StopWatch();
@@ -56,7 +56,7 @@ public class BIClient {
 
 			var finalurl = url + operation + "/" + message;
 
-			log.trace("path url: {}", url);
+			log.trace("path url: {}", finalurl);
 
 			final var ureBuilder = UriComponentsBuilder.fromHttpUrl(finalurl);
 
@@ -72,9 +72,9 @@ public class BIClient {
 
 			log.debug("encode url: {}", ureBuilder.build().encode().toUri());
 
-			final ResponseEntity<SMSResponse> responseSMS = restTemplate.exchange(ureBuilder.build().encode().toUri(),
-					HttpMethod.PUT, null, SMSResponse.class);
-			final var response = responseSMS.getBody();
+			final ResponseEntity<EMAILResponse> responseEMAIL = restTemplate
+					.exchange(ureBuilder.build().encode().toUri(), HttpMethod.PUT, null, EMAILResponse.class);
+			final var response = responseEMAIL.getBody();
 			log.debug("responseBI: {}", response);
 
 			if (response == null || !Boolean.valueOf(response.getIsValid()))

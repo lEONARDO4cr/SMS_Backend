@@ -1,4 +1,4 @@
-package co.com.claro.sms.services;
+package co.com.claro.email.service;
 
 import java.util.Date;
 
@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -14,33 +15,35 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import brave.Tracer;
-import co.com.claro.sms.client.BIClient;
-import co.com.claro.sms.dto.RequestDTO;
-import co.com.claro.sms.dto.ResponseDTO;
-import co.com.claro.sms.dto.sms.notification.HeaderRequest;
-import co.com.claro.sms.dto.sms.notification.MessageRequest;
-import co.com.claro.sms.dto.sms.notification.RequestSMS;
-import co.com.claro.sms.dto.sms.notification.SMSResponse;
-import co.com.claro.sms.entity.Log;
-import co.com.claro.sms.service.LogService;
-import co.com.claro.sms.util.AESUtil;
-import co.com.claro.sms.util.Util;
+import co.com.claro.email.client.BIClient;
+import co.com.claro.email.dto.RequestDTO;
+import co.com.claro.email.dto.ResponseDTO;
+import co.com.claro.email.dto.email.notification.EMAILResponse;
+import co.com.claro.email.dto.email.notification.HeaderRequest;
+import co.com.claro.email.dto.email.notification.MessageRequest;
+import co.com.claro.email.dto.email.notification.RequestEMAIL;
+import co.com.claro.email.entity.Log;
+import co.com.claro.email.util.AESUtil;
+import co.com.claro.email.util.Util;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class SMSServices {
+public class EmailService {
 
 	public static final String INVALID_TOKEN = "El token enviado en la URL es invalido valor de token: %s ";
 	public static final String PARAMETER_TELEFONOS = "telefonos";
 	public static final String MISSING_VALUE_ERROR = "Hace falta el parametro '%s' en la url de inicio";
 	public static final String MISSING_VALUE_ERROR2 = "Hace falta el valor para el parametro '%s' en la url de inicio";
 
-	@Value("${sms.token.key:SMSEMAIL}")
+	@Value("${email.token.key:SMSEMAIL}")
 	private String tokenKey;
 
-	@Value("${sms.url:http://100.126.21.189:7777/Notification/V2.0/Rest/PutMessage}")
+	@Value("${email.send.url:http://100.126.21.189:7777/Notification/V2.0/Rest/PutMessage}")
 	private String url;
+
+	@Value("${email.default.subject:Prueba}")
+	private String subject;
 
 	@Autowired
 	private Tracer tracer;
@@ -54,11 +57,16 @@ public class SMSServices {
 	@Autowired
 	private BIClient biClient;
 
-	public ResponseDTO sendSMS(RequestDTO request) throws JsonProcessingException {
+	public ResponseDTO sendEMAIL(RequestDTO request) throws JsonProcessingException {
 
-		log.info("[[START]] decriptToken: {}", request);
+		final var requestEMAIL = buildRequest(request);
+		log.info("requestEMAIL: {}", requestEMAIL);
 
-		sendSMS(request.getPhone(), request.getMessage());
+		final var httpEntity = new HttpEntity<>(requestEMAIL);
+		final ResponseEntity<EMAILResponse> responseEMAIL = restTemplate.exchange(url, HttpMethod.PUT, httpEntity,
+				EMAILResponse.class);
+		log.info("responseSMS: {}", responseEMAIL.getBody());
+
 		insertLog(request);
 
 		if (request.getBi() != null) {
@@ -68,19 +76,13 @@ public class SMSServices {
 
 		}
 
-		return new ResponseDTO();
-	}
+		ResponseDTO response = new ResponseDTO();
+		response.setMessage("OK");
+		response.setResponseCode(HttpStatus.OK);
+		response.setTransactionDate(new Date());
+		response.setTransactionId(getTraceId());
 
-	private void sendSMS(String phone, String message) {
-
-		final var requestSMS = buildRequest(phone, message);
-		log.info("requestSMS: {}", requestSMS);
-
-		final var httpEntity = new HttpEntity<>(requestSMS);
-		final ResponseEntity<SMSResponse> responseSMS = restTemplate.exchange(url, HttpMethod.PUT, httpEntity,
-				SMSResponse.class);
-		log.info("responseSMS: {}", responseSMS.getBody());
-
+		return response;
 	}
 
 	public void insertLog(RequestDTO request) {
@@ -90,12 +92,12 @@ public class SMSServices {
 		auditLog.setAsesorCod(request.getAsesorCod());
 		auditLog.setAsesorDocument(request.getAsesorDocument());
 		auditLog.setAsesorName(request.getAsesorName());
-		auditLog.setChannel("SMS");
+		auditLog.setChannel("EMAIL");
 		auditLog.setDocument(request.getClientDocument());
 		auditLog.setEmail(request.getClientEmail());
 		auditLog.setMessage(request.getMessage());
-		auditLog.setPhone(request.getPhone());
 		auditLog.setMessage(request.getMessage());
+		auditLog.setSubject(request.getSubject());
 		auditLog.setTypeDocument(request.getClientTypeDocument());
 
 		logService.insert(auditLog);
@@ -116,9 +118,9 @@ public class SMSServices {
 
 	}
 
-	public RequestSMS buildRequest(String phone, String message) {
+	public RequestEMAIL buildRequest(RequestDTO request) {
 
-		final var requestSMS = new RequestSMS();
+		final var requestEMAIL = new RequestEMAIL();
 
 		final var headerRequest = new HeaderRequest();
 		headerRequest.setIpApplication("127.0.0.1");
@@ -130,31 +132,42 @@ public class SMSServices {
 		headerRequest.setTransacitonID(getTraceId());
 		headerRequest.setUser("user433");
 
-		requestSMS.setHeaderRequest(headerRequest);
+		requestEMAIL.setHeaderRequest(headerRequest);
 
 		final var messageRequest = new MessageRequest();
+		messageRequest.setDateTime(new Date().getTime());
 		messageRequest.setCommunicationOrigin("TCRM");
-		messageRequest.addCommunicationType("COMERCIAL");
+		messageRequest.addCommunicationType("REGULATORIO");
 		messageRequest.setContentType("MESSAGE");
-		messageRequest.setDeliveryReceipts("YES");
-		messageRequest.setMessageContent(message);
+		messageRequest.setDeliveryReceipts("NO");
+		messageRequest.setMessageContent(request.getMessage());
+		messageRequest.addProfileId("SMTP_FS_TCRM1");
 		messageRequest.addProfileId("SMS_FS_TCRM1");
 		messageRequest.setPushType("SINGLE");
-		messageRequest.setTypeCostumer("25987563");
+		messageRequest.setTypeCostumer("9F1AA44D-B90F-E811-80ED-FA163E10DFBE");
+		messageRequest.setIdMessage(getTraceId());
 
-		messageRequest.addMessageBox("SMS", phone);
+		if (request.getSubject() == null || request.getSubject().isBlank()) {
+			messageRequest.setSubject(subject);
+		} else {
+			messageRequest.setSubject(request.getSubject());
+		}
+
+		messageRequest.addMessageBox("SMTP", request.getEmail());
 
 		try {
 
 			// Convertir a string
 			final var jsonMessage = Util.objectToJson(messageRequest);
-			requestSMS.setMessage(jsonMessage);
+			requestEMAIL.setMessage(jsonMessage);
+
+			log.info("json: {}", jsonMessage);
 
 		} catch (final JsonProcessingException e) {
 			log.error("JsonProcessingException: {}", e.getMessage(), e);
 		}
 
-		return requestSMS;
+		return requestEMAIL;
 
 	}
 
