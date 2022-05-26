@@ -19,7 +19,7 @@ public class Log implements Serializable {
 	private String id;
 
 	private Date date = new Date();
-	private String channel = "SMS";
+	private String channel = "EMAIL";
 
 	private String phone;
 	private String message;

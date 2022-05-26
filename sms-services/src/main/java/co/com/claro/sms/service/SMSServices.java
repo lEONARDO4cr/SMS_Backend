@@ -1,4 +1,4 @@
-package co.com.claro.sms.services;
+package co.com.claro.sms.service;
 
 import java.util.Date;
 

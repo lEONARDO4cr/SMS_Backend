@@ -32,7 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 public class EmailService {
 
 	public static final String INVALID_TOKEN = "El token enviado en la URL es invalido valor de token: %s ";
-	public static final String PARAMETER_TELEFONOS = "telefonos";
 	public static final String MISSING_VALUE_ERROR = "Hace falta el parametro '%s' en la url de inicio";
 	public static final String MISSING_VALUE_ERROR2 = "Hace falta el valor para el parametro '%s' en la url de inicio";
 

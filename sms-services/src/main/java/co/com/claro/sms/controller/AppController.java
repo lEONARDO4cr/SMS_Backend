@@ -20,7 +20,7 @@ import co.com.claro.sms.dto.RequestDecriptDTO;
 import co.com.claro.sms.dto.RequestEncriptTokenDTO;
 import co.com.claro.sms.entity.Log;
 import co.com.claro.sms.service.LogService;
-import co.com.claro.sms.services.SMSServices;
+import co.com.claro.sms.service.SMSServices;
 import co.com.claro.sms.util.AESUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,8 +50,7 @@ public class AppController {
 			if (request == null || request.getPhone() == null)
 				throw new RuntimeException("Telefono invalido");
 
-			if (request == null || request.getMessage() == null || request.getMessage().isBlank()
-					|| request.getMessage().length() > 150)
+			if (request.getMessage() == null || request.getMessage().isBlank() || request.getMessage().length() > 150)
 				throw new RuntimeException("Mensaje invalido");
 
 			services.sendSMS(request);
