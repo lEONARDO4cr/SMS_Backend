@@ -23,6 +23,7 @@ import co.com.claro.email.dto.email.notification.HeaderRequest;
 import co.com.claro.email.dto.email.notification.MessageRequest;
 import co.com.claro.email.dto.email.notification.RequestEMAIL;
 import co.com.claro.email.entity.Log;
+import co.com.claro.email.exception.BussinesException;
 import co.com.claro.email.util.AESUtil;
 import co.com.claro.email.util.Util;
 import lombok.extern.slf4j.Slf4j;
@@ -97,6 +98,7 @@ public class EmailService {
 		auditLog.setMessage(request.getMessage());
 		auditLog.setMessage(request.getMessage());
 		auditLog.setSubject(request.getSubject());
+		auditLog.setClientName(request.getClientName());
 		auditLog.setTypeDocument(request.getClientTypeDocument());
 
 		logService.insert(auditLog);
@@ -193,7 +195,7 @@ public class EmailService {
 			return desencriptado;
 
 		} catch (final Exception e) {
-			throw new RuntimeException(e.getMessage());
+			throw new BussinesException(e.getMessage());
 		}
 
 	}

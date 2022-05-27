@@ -12,6 +12,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import co.com.claro.email.dto.RequestDTO;
 import co.com.claro.email.dto.ResponseDTO;
+import co.com.claro.email.exception.BadRequestException;
 import co.com.claro.email.service.EmailService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,8 +36,17 @@ public class AppController {
 
 		try {
 
-			if (request == null || request.getEmail() == null)
-				throw new RuntimeException("Email invalido");
+			if (request == null) {
+				throw new BadRequestException("Request invalido");
+			}
+
+			if (request.getEmail() == null || request.getEmail().isEmpty())
+				throw new BadRequestException("Email invalido");
+
+			if (request.getMessage() == null || request.getMessage().isEmpty()) {
+				throw new BadRequestException("Mensaje invalido");
+
+			}
 
 			return services.sendEMAIL(request);
 
