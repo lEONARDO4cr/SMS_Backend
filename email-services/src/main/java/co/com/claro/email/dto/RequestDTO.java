@@ -27,6 +27,6 @@ public class RequestDTO implements Serializable {
 	private String asesorName;
 	private String asesorSignum;
 
-	private Map<String, Object> bi;
+	private transient Map<String, Object> bi;
 
 }

@@ -10,27 +10,27 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import brave.Tracer;
 import co.com.claro.email.dto.ResponseDTO;
-import co.com.claro.email.exception.BussinesException;
+import co.com.claro.email.exception.BadRequestException;
 
 @ControllerAdvice
-public class BussinesExceptionHandler {
+public class CallLegacyExceptionHandler {
 
 	@Autowired
 	private Tracer tracer;
 
 	@ExceptionHandler
-	public ResponseEntity<ResponseDTO> exceptionHandler(BussinesException ex) {
+	public ResponseEntity<ResponseDTO> exceptionHandler(BadRequestException ex) {
 
 		final var error = new ResponseDTO();
 
 		error.setTransactionDate(new Date());
 		error.setResponseCode(HttpStatus.EXPECTATION_FAILED);
-		error.setMessage(String.format("BussinesException error: %s", ex.getMessage()));
+		error.setMessage(String.format("BadRequest error: %s", ex.getMessage()));
 		error.setTransactionId(tracer.currentSpan().context().traceIdString());
 
 		// Agregar error
 		if (ex.getCause() != null) {
-			error.setMessage(String.format("BussinesException error: %s", ex.getCause().getMessage()));
+			error.setMessage(String.format("BadRequest error: %s", ex.getCause().getMessage()));
 		}
 
 		return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(error);

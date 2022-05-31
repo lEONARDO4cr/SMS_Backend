@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RequestEncriptTokenDTO implements Serializable {
 
-	private Map<String, Object> data;
+	private transient Map<String, Object> data;
 	private String key;
 
 }

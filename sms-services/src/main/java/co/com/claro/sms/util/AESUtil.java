@@ -12,9 +12,9 @@ public class AESUtil {
 		throw new RuntimeException("Utility class");
 	}
 
-	public final static String TYPE = "AES";
-	public final static String INSTANCE = "AES/ECB/PKCS7Padding";
-	public final static String PROVIDER = "BC";
+	public static final String TYPE = "AES";
+	public static final String INSTANCE = "AES/ECB/PKCS7Padding";
+	public static final String PROVIDER = "BC";
 
 	public static String encrypt(String datos, String claveSecreta) throws Exception {
 

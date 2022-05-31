@@ -6,12 +6,18 @@ import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-public class AESUtil {
-	public final static String TYPE = "AES";
-	public final static String INSTANCE = "AES/ECB/PKCS7Padding";
-	public final static String PROVIDER = "BC";
+import co.com.claro.email.exception.BussinesException;
 
-	public static String encrypt(String datos, String claveSecreta) throws Exception {
+public class AESUtil {
+	public static final String TYPE = "AES";
+	public static final String INSTANCE = "AES/ECB/PKCS7Padding";
+	public static final String PROVIDER = "BC";
+
+	private AESUtil() {
+		throw new BussinesException("Utility class");
+	}
+
+	public static String encrypt(String datos, String claveSecreta) {
 
 		try {
 			Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
@@ -27,14 +33,14 @@ public class AESUtil {
 
 			int ctLength = cipher.update(input, 0, input.length, cipherText, 0);
 
-			ctLength += cipher.doFinal(cipherText, ctLength);
+			cipher.doFinal(cipherText, ctLength);
 			return Base64.getEncoder().encodeToString(cipherText);
 		} catch (Exception ex) {
 			return null;
 		}
 	}
 
-	public static String decrypt(String datosEncriptados, String claveSecreta) throws Exception {
+	public static String decrypt(String datosEncriptados, String claveSecreta) {
 
 		try {
 			Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
