@@ -6,10 +6,12 @@ import java.util.Date;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import co.com.claro.sms.exception.BussinesException;
+
 public class Util {
 
 	private Util() {
-		throw new RuntimeException("Utility class");
+		throw new BussinesException("Utility class");
 	}
 
 	public static String dateToString(Date date, String format) {

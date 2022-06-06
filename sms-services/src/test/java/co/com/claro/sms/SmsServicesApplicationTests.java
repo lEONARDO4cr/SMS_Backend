@@ -1,13 +1,17 @@
 package co.com.claro.sms;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.scheduling.annotation.EnableAsync;
 
-@SpringBootTest
-class SmsServicesApplicationTests {
+@EnableAsync
+@EnableRetry
+@SpringBootApplication
+public class SmsServicesApplicationTests {
 
-	@Test
-	void contextLoads() {
+	public static void main(String[] args) {
+		SpringApplication.run(SmsServicesApplicationTests.class, args);
 	}
 
 }

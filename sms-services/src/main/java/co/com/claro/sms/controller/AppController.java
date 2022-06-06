@@ -19,6 +19,8 @@ import co.com.claro.sms.dto.RequestDTO;
 import co.com.claro.sms.dto.RequestDecriptDTO;
 import co.com.claro.sms.dto.RequestEncriptTokenDTO;
 import co.com.claro.sms.entity.Log;
+import co.com.claro.sms.exception.BadRequestException;
+import co.com.claro.sms.exception.BussinesException;
 import co.com.claro.sms.service.LogService;
 import co.com.claro.sms.service.SMSServices;
 import co.com.claro.sms.util.AESUtil;
@@ -48,10 +50,10 @@ public class AppController {
 		try {
 
 			if (request == null || request.getPhone() == null)
-				throw new RuntimeException("Telefono invalido");
+				throw new BadRequestException("Telefono invalido");
 
 			if (request.getMessage() == null || request.getMessage().isBlank() || request.getMessage().length() > 150)
-				throw new RuntimeException("Mensaje invalido");
+				throw new BadRequestException("Mensaje invalido");
 
 			services.sendSMS(request);
 
@@ -64,17 +66,25 @@ public class AppController {
 
 	@CrossOrigin
 	@PostMapping("/sms/encript")
-	public String encript(@RequestBody RequestEncriptTokenDTO encriptTokenDTO) throws Exception {
+	public String encript(@RequestBody RequestEncriptTokenDTO encriptTokenDTO) {
 
 		log.info("[[START]] encriptTokenDTO: {}", encriptTokenDTO);
 
-		final var data = new ObjectMapper().writeValueAsString(encriptTokenDTO.getData());
-		log.info("data: {}", data);
+		String data;
 
-		final var encrypt = AESUtil.encrypt(data, encriptTokenDTO.getKey());
-		log.info("encrypt: {}", encrypt);
+		try {
 
-		return encrypt;
+			data = new ObjectMapper().writeValueAsString(encriptTokenDTO.getData());
+
+			log.info("data: {}", data);
+
+			final var encrypt = AESUtil.encrypt(data, encriptTokenDTO.getKey());
+			log.info("encrypt: {}", encrypt);
+			return encrypt;
+
+		} catch (JsonProcessingException e) {
+			throw new BussinesException(e.getMessage(), e);
+		}
 
 	}
 

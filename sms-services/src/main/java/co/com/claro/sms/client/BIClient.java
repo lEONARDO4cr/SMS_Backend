@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import co.com.claro.sms.dto.sms.notification.SMSResponse;
+import co.com.claro.sms.exception.CallLegacyException;
 import co.com.claro.sms.util.Util;
 
 @Service
@@ -78,7 +79,7 @@ public class BIClient {
 			log.debug("responseBI: {}", response);
 
 			if (response == null || !Boolean.valueOf(response.getIsValid()))
-				throw new RuntimeException("No se logro crear la BI");
+				throw new CallLegacyException("No se logro crear la BI");
 
 		} finally {
 			watch.stop();

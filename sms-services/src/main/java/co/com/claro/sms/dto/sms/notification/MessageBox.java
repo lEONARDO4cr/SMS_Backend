@@ -20,13 +20,13 @@ public class MessageBox implements Serializable {
 	private String messageChannel;
 
 	@JsonProperty("messageBox")
-	private List<MessageBox__1> messageBox_ = new ArrayList<>();
+	private List<MessageBox__1> messageBoxs = new ArrayList<>();
 
 	public void addMessageBox(String customerBox) {
 
 		MessageBox__1 messageBox1 = new MessageBox__1();
 		messageBox1.setCustomerBox(customerBox);
-		messageBox_.add(messageBox1);
+		messageBoxs.add(messageBox1);
 
 	}
 

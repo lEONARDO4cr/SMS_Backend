@@ -6,17 +6,19 @@ import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import co.com.claro.sms.exception.BussinesException;
+
 public class AESUtil {
 
 	private AESUtil() {
-		throw new RuntimeException("Utility class");
+		throw new BussinesException("Utility class");
 	}
 
 	public static final String TYPE = "AES";
 	public static final String INSTANCE = "AES/ECB/PKCS7Padding";
 	public static final String PROVIDER = "BC";
 
-	public static String encrypt(String datos, String claveSecreta) throws Exception {
+	public static String encrypt(String datos, String claveSecreta) {
 
 		try {
 			Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
@@ -40,7 +42,7 @@ public class AESUtil {
 		}
 	}
 
-	public static String decrypt(String datosEncriptados, String claveSecreta) throws Exception {
+	public static String decrypt(String datosEncriptados, String claveSecreta) {
 
 		try {
 			Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());

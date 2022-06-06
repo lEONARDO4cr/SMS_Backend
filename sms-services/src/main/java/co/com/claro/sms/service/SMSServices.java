@@ -22,7 +22,7 @@ import co.com.claro.sms.dto.sms.notification.MessageRequest;
 import co.com.claro.sms.dto.sms.notification.RequestSMS;
 import co.com.claro.sms.dto.sms.notification.SMSResponse;
 import co.com.claro.sms.entity.Log;
-import co.com.claro.sms.service.LogService;
+import co.com.claro.sms.exception.BussinesException;
 import co.com.claro.sms.util.AESUtil;
 import co.com.claro.sms.util.Util;
 import lombok.extern.slf4j.Slf4j;
@@ -181,7 +181,7 @@ public class SMSServices {
 			return desencriptado;
 
 		} catch (final Exception e) {
-			throw new RuntimeException(e.getMessage());
+			throw new BussinesException(e.getMessage());
 		}
 
 	}
