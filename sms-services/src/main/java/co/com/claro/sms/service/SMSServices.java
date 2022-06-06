@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -26,6 +27,7 @@ import co.com.claro.sms.exception.BussinesException;
 import co.com.claro.sms.util.AESUtil;
 import co.com.claro.sms.util.Util;
 import lombok.extern.slf4j.Slf4j;
+
 
 @Slf4j
 @Service
@@ -68,7 +70,15 @@ public class SMSServices {
 
 		}
 
-		return new ResponseDTO();
+
+		ResponseDTO response = new ResponseDTO();
+		response.setMessage("OK");
+		response.setResponseCode(HttpStatus.OK);
+		response.setTransactionDate(new Date());
+		response.setTransactionId(getTraceId());
+
+		return response;
+		
 	}
 
 	private void sendSMS(String phone, String message) {

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: smsservices-secret
+  name: emailservices-secret
   namespace: nm-ivr-evolucion-dev
 type: Opaque
 data: {}
@@ -9,18 +9,18 @@ data: {}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: smsservices-config
+  name: emailservices-config
   namespace: nm-ivr-evolucion-dev
 data:
   PORT: "8080"
-  SPRING_APPLICATION_NAME: "smsservices"
+  SPRING_APPLICATION_NAME: "emailservices"
   LOGGING_LEVEL_CO_COM_CLARO: "trace"
   LOGGING_PATTERN_CONSOLE: "{\"applicationName\":\"${spring.application.name}\", \"methodName\":\"%M\", \"transactionId\":\"%X{X-B3-TraceId:-}\", \"level\": \"%p\", \"message\": \"%replace(%m%wEx{6}){'[\r\n]+', '\\n'}%nopex\", \"processingTime\":\"\", \"timestamp\": \"%d\", \"source\": \"%logger{63}:%L\"}%n"
   LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WS_CLIENT_MESSAGETRACING_SENT: "TRACE"
   LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WS_SERVER_MESSAGETRACING_SENT: "TRACE"
   LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WS_CLIENT_MESSAGETRACING_RECEIVED: "TRACE"
   LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WS_SERVER_MESSAGETRACING_RECEIVED: "TRACE"
-  SMS_TOKEN_KEY: "SMSEMAIL"
+  email_TOKEN_KEY: "emailEMAIL"
   CLIENTBI_URL: "http://100.126.21.189:7777/BIZInteractions/Rest/V1.0/BizInteractionsApi/put/"
   CLIENTBI_PASSWORD_DEFAULT_VALUE: "password1"
   CLIENTBI_USER_DEFAULT_VALUE: "user1"
@@ -36,19 +36,19 @@ apiVersion: v1
 kind: DeploymentConfig
 metadata:
   labels:
-    app: smsservices
-    legado: SMS
+    app: emailservices
+    legado: email
     proyecto: IVR
-    subproyecto: SMS
+    subproyecto: email
     tecnologia: SpringBoot-Maven
-  name: smsservices
+  name: emailservices
   namespace: nm-ivr-evolucion-dev
 spec:
   replicas: 1
   revisionHistoryLimit: 10
   selector:
-    app: smsservices
-    deploymentconfig: smsservices
+    app: emailservices
+    deploymentconfig: emailservices
   strategy:
     activeDeadlineSeconds: 21600
     resources:
@@ -68,19 +68,19 @@ spec:
   template:
     metadata:
       labels:
-        app: smsservices
-        deploymentconfig: smsservices
-      name : smsservices
+        app: emailservices
+        deploymentconfig: emailservices
+      name : emailservices
     spec:
       containers:
         - envFrom:
             - configMapRef:
-                name: smsservices-config
+                name: emailservices-config
             - secretRef:
-                name: smsservices-secret
-          image: docker-registry.default.svc:5000/nm-ivr-evolucion-dev/smsservices:latest
+                name: emailservices-secret
+          image: docker-registry.default.svc:5000/nm-ivr-evolucion-dev/emailservices:latest
           imagePullPolicy: IfNotPresent
-          name: smsservices
+          name: emailservices
           ports:
             - name : service-port
               containerPort: 8080
@@ -104,8 +104,8 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: smsservices
-  name: smsservices
+    app: emailservices
+  name: emailservices
   namespace: nm-ivr-evolucion-dev
 spec:
   ports:
@@ -114,8 +114,8 @@ spec:
       protocol: TCP
       targetPort: 8080
   selector:
-    app: smsservices
-    deploymentconfig: smsservices
+    app: emailservices
+    deploymentconfig: emailservices
   sessionAffinity: None
   type: ClusterIP
 ---
@@ -123,14 +123,14 @@ apiVersion: v1
 kind: Route
 metadata:
   labels:
-    app: smsservices
-  name: smsservices
+    app: emailservices
+  name: emailservices
   namespace: nm-ivr-evolucion-dev
 spec:
   port:
     targetPort: service-port
   to:
     kind: Service
-    name: smsservices
+    name: emailservices
     weight: 100
   wildcardPolicy: None
