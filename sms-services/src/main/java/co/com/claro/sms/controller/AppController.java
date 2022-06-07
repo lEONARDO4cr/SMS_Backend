@@ -48,12 +48,17 @@ public class AppController {
 
 		try {
 
-			if (request == null || request.getPhone() == null)
+			if (request == null || request.getPhone() == null) {
 				throw new BadRequestException("Telefono invalido");
+			}
 
-			if (request.getMessage() == null || request.getMessage().isBlank()
-					|| request.getMessage().length() > caracterPermitido)
-				throw new BadRequestException("Mensaje invalido");
+			if (request.getMessage() == null || request.getMessage().isBlank()) {
+				throw new BadRequestException("El Mensaje esta vacio");
+			}
+
+			if (request.getMessage().length() >= caracterPermitido) {
+				throw new BadRequestException("El Mensaje supera el numero de caracteres permitidos");
+			}
 
 			return services.sendSMS(request);
 
