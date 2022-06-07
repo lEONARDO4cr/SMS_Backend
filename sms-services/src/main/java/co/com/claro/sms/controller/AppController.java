@@ -1,6 +1,7 @@
 package co.com.claro.sms.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,11 +27,14 @@ import lombok.extern.slf4j.Slf4j;
 @CrossOrigin
 @RestController
 @RequestMapping("/api/v1")
-@Api(tags = "SMS-services", produces = "application/json", value =  "Api encargada de enviar un mensaje SMS, crear una BI y guardar el log en la base de datos")
+@Api(tags = "SMS-services", produces = "application/json", value = "Api encargada de enviar un mensaje SMS, crear una BI y guardar el log en la base de datos")
 public class AppController {
 
 	@Autowired
 	private SMSServices services;
+
+	@Value("${CARACTER_PERMITIDO_VALUE:170}")
+	private int caracterPermitido;
 
 	@CrossOrigin
 	@PostMapping("/sms/send")
@@ -47,7 +51,8 @@ public class AppController {
 			if (request == null || request.getPhone() == null)
 				throw new BadRequestException("Telefono invalido");
 
-			if (request.getMessage() == null || request.getMessage().isBlank() || request.getMessage().length() > 150)
+			if (request.getMessage() == null || request.getMessage().isBlank()
+					|| request.getMessage().length() > caracterPermitido)
 				throw new BadRequestException("Mensaje invalido");
 
 			return services.sendSMS(request);

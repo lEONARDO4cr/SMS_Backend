@@ -28,7 +28,6 @@ import co.com.claro.sms.util.AESUtil;
 import co.com.claro.sms.util.Util;
 import lombok.extern.slf4j.Slf4j;
 
-
 @Slf4j
 @Service
 public class SMSServices {
@@ -38,10 +37,10 @@ public class SMSServices {
 	public static final String MISSING_VALUE_ERROR = "Hace falta el parametro '%s' en la url de inicio";
 	public static final String MISSING_VALUE_ERROR2 = "Hace falta el valor para el parametro '%s' en la url de inicio";
 
-	@Value("${sms.token.key:SMSEMAIL}")
+	@Value("${SMS_TOKEN_KEY:SMSEMAIL}")
 	private String tokenKey;
 
-	@Value("${sms.url:http://100.126.21.189:7777/Notification/V2.0/Rest/PutMessage}")
+	@Value("${SMS_URI:http://100.126.21.189:7777/Notification/V2.0/Rest/PutMessage}")
 	private String url;
 
 	@Autowired
@@ -70,7 +69,6 @@ public class SMSServices {
 
 		}
 
-
 		ResponseDTO response = new ResponseDTO();
 		response.setMessage("OK");
 		response.setResponseCode(HttpStatus.OK);
@@ -78,7 +76,7 @@ public class SMSServices {
 		response.setTransactionId(getTraceId());
 
 		return response;
-		
+
 	}
 
 	private void sendSMS(String phone, String message) {
@@ -151,7 +149,6 @@ public class SMSServices {
 		messageRequest.addProfileId("SMS_FS_TCRM1");
 		messageRequest.setPushType("SINGLE");
 		messageRequest.setTypeCostumer("25987563");
-
 		messageRequest.addMessageBox("SMS", phone);
 
 		try {
