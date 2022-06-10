@@ -7,10 +7,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class HeaderRequest implements Serializable {
 
@@ -37,6 +35,5 @@ public class HeaderRequest implements Serializable {
 
 	@JsonProperty("traceabilityId")
 	private String traceabilityId;
-	
 
 }

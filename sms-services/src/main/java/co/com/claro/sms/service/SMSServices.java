@@ -24,6 +24,8 @@ import co.com.claro.sms.dto.sms.notification.RequestSMS;
 import co.com.claro.sms.dto.sms.notification.SMSResponse;
 import co.com.claro.sms.entity.Log;
 import co.com.claro.sms.exception.BussinesException;
+import co.com.claro.sms.properties.HeaderRequestProperties;
+import co.com.claro.sms.properties.MessageRequestProperties;
 import co.com.claro.sms.util.AESUtil;
 import co.com.claro.sms.util.Util;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +38,12 @@ public class SMSServices {
 	public static final String PARAMETER_TELEFONOS = "telefonos";
 	public static final String MISSING_VALUE_ERROR = "Hace falta el parametro '%s' en la url de inicio";
 	public static final String MISSING_VALUE_ERROR2 = "Hace falta el valor para el parametro '%s' en la url de inicio";
+
+	@Autowired
+	private HeaderRequestProperties headerRequestProperties;
+
+	@Autowired
+	private MessageRequestProperties messageRequestProperties;
 
 	@Value("${SMS_TOKEN_KEY:SMSEMAIL}")
 	private String tokenKey;
@@ -129,26 +137,26 @@ public class SMSServices {
 		final var requestSMS = new RequestSMS();
 
 		final var headerRequest = new HeaderRequest();
-		headerRequest.setIpApplication("127.0.0.1");
-		headerRequest.setPassword("system432");
-		headerRequest.setRequestDate(Util.dateToString(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSS"));
-		headerRequest.setSystem("system432");
-		headerRequest.setTarget("target");
-		headerRequest.setTraceabilityId("traceabilityId436");
+		headerRequest.setIpApplication(headerRequestProperties.getIpApplication());
+		headerRequest.setPassword(headerRequestProperties.getPassword());
+		headerRequest.setRequestDate(Util.dateToString(new Date(), headerRequestProperties.getRequestDateFormat()));
+		headerRequest.setSystem(headerRequestProperties.getSystem());
+		headerRequest.setTarget(headerRequestProperties.getTarget());
+		headerRequest.setTraceabilityId(headerRequestProperties.getTraceabilityId());
 		headerRequest.setTransacitonID(getTraceId());
-		headerRequest.setUser("user433");
+		headerRequest.setUser(headerRequestProperties.getUser());
 
 		requestSMS.setHeaderRequest(headerRequest);
 
 		final var messageRequest = new MessageRequest();
-		messageRequest.setCommunicationOrigin("TCRM");
-		messageRequest.addCommunicationType("COMERCIAL");
-		messageRequest.setContentType("MESSAGE");
-		messageRequest.setDeliveryReceipts("YES");
+		messageRequest.setCommunicationOrigin(messageRequestProperties.getCommunicationOrigin());
+		messageRequest.addCommunicationType(messageRequestProperties.getCommunicationType());
+		messageRequest.setContentType(messageRequestProperties.getContentType());
+		messageRequest.setDeliveryReceipts(messageRequestProperties.getDeliveryReceipts());
 		messageRequest.setMessageContent(message);
 		messageRequest.addProfileId("SMS_FS_TCRM1");
-		messageRequest.setPushType("SINGLE");
-		messageRequest.setTypeCostumer("25987563");
+		messageRequest.setPushType(messageRequestProperties.getPushType());
+		messageRequest.setTypeCostumer(messageRequestProperties.getTypeCostumer());
 		messageRequest.addMessageBox("SMS", phone);
 
 		try {
