@@ -24,6 +24,8 @@ import co.com.claro.email.dto.email.notification.MessageRequest;
 import co.com.claro.email.dto.email.notification.RequestEMAIL;
 import co.com.claro.email.entity.Log;
 import co.com.claro.email.exception.BussinesException;
+import co.com.claro.email.properties.HeaderRequestProperties;
+import co.com.claro.email.properties.MessageRequestProperties;
 import co.com.claro.email.util.AESUtil;
 import co.com.claro.email.util.Util;
 import lombok.extern.slf4j.Slf4j;
@@ -36,13 +38,19 @@ public class EmailService {
 	public static final String MISSING_VALUE_ERROR = "Hace falta el parametro '%s' en la url de inicio";
 	public static final String MISSING_VALUE_ERROR2 = "Hace falta el valor para el parametro '%s' en la url de inicio";
 
-	@Value("${email.token.key:SMSEMAIL}")
+	@Autowired
+	private HeaderRequestProperties headerRequestProperties;
+
+	@Autowired
+	private MessageRequestProperties messageRequestProperties;
+
+	@Value("${EMAIL_TOKEN_KEY:SMSEMAIL}")
 	private String tokenKey;
 
-	@Value("${email.send.url:http://100.126.21.189:7777/Notification/V2.0/Rest/PutMessage}")
+	@Value("${EMAIL_SEND_URL:http://100.126.21.189:7777/Notification/V2.0/Rest/PutMessage}")
 	private String url;
 
-	@Value("${email.default.subject:Prueba}")
+	@Value("${EMAIL_DEFAULT_SUBJECT:Prueba}")
 	private String subject;
 
 	@Autowired
@@ -124,28 +132,28 @@ public class EmailService {
 		final var requestEMAIL = new RequestEMAIL();
 
 		final var headerRequest = new HeaderRequest();
-		headerRequest.setIpApplication("127.0.0.1");
-		headerRequest.setPassword("system432");
-		headerRequest.setRequestDate(Util.dateToString(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSS"));
-		headerRequest.setSystem("system432");
-		headerRequest.setTarget("target");
-		headerRequest.setTraceabilityId("traceabilityId436");
+		headerRequest.setIpApplication(headerRequestProperties.getIpApplication());
+		headerRequest.setPassword(headerRequestProperties.getPassword());
+		headerRequest.setRequestDate(Util.dateToString(new Date(), headerRequestProperties.getRequestDateFormat()));
+		headerRequest.setSystem(headerRequestProperties.getSystem());
+		headerRequest.setTarget(headerRequestProperties.getTarget());
+		headerRequest.setTraceabilityId(headerRequestProperties.getTraceabilityId());
 		headerRequest.setTransacitonID(getTraceId());
-		headerRequest.setUser("user433");
+		headerRequest.setUser(headerRequestProperties.getUser());
 
 		requestEMAIL.setHeaderRequest(headerRequest);
 
 		final var messageRequest = new MessageRequest();
 		messageRequest.setDateTime(new Date().getTime());
-		messageRequest.setCommunicationOrigin("TCRM");
-		messageRequest.addCommunicationType("REGULATORIO");
-		messageRequest.setContentType("MESSAGE");
-		messageRequest.setDeliveryReceipts("NO");
+		messageRequest.setCommunicationOrigin(messageRequestProperties.getCommunicationOrigin());
+		messageRequest.addCommunicationType(messageRequestProperties.getCommunicationType());
+		messageRequest.setContentType(messageRequestProperties.getContentType());
+		messageRequest.setDeliveryReceipts(messageRequestProperties.getDeliveryReceipts());
 		messageRequest.setMessageContent(request.getMessage());
 		messageRequest.addProfileId("SMTP_FS_TCRM1");
 		messageRequest.addProfileId("SMS_FS_TCRM1");
-		messageRequest.setPushType("SINGLE");
-		messageRequest.setTypeCostumer("9F1AA44D-B90F-E811-80ED-FA163E10DFBE");
+		messageRequest.setPushType(messageRequestProperties.getPushType());
+		messageRequest.setTypeCostumer(messageRequestProperties.getTypeCostumer());
 		messageRequest.setIdMessage(getTraceId());
 
 		if (request.getSubject() == null || request.getSubject().isBlank()) {
