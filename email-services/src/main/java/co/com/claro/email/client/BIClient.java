@@ -24,16 +24,16 @@ import co.com.claro.email.util.Util;
 @Service
 public class BIClient {
 
-	@Value("${CLIENTBI_GETOPERATION_DEFAULT_VALUE=setPresencialBizInteraction}")
+	@Value("${CLIENTBI_GETOPERATION_DEFAULT_VALUE:setPresencialBizInteraction}")
 	public String operation;
 
-	@Value("${CLIENTBI_SYSTEM_DEFAULT_VALUE=Vista360}")
+	@Value("${CLIENTBI_SYSTEM_DEFAULT_VALUE:Vista360}")
 	private String system;
 
-	@Value("${CLIENTBI_USER_DEFAULT_VALUE=user1}")
+	@Value("${CLIENTBI_USER_DEFAULT_VALUE:user1}")
 	private String user;
 
-	@Value("${CLIENTBI_PASSWORD_DEFAULT_VALUE=password1}")
+	@Value("${CLIENTBI_PASSWORD_DEFAULT_VALUE:password1}")
 	private String password;
 
 	@Value("${CLIENTBI_URL=http://100.126.21.189:7777/BIZInteractions/Rest/V1.0/BizInteractionsApi/put/}")
