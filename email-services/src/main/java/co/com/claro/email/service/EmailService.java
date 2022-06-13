@@ -150,8 +150,7 @@ public class EmailService {
 		messageRequest.setContentType(messageRequestProperties.getContentType());
 		messageRequest.setDeliveryReceipts(messageRequestProperties.getDeliveryReceipts());
 		messageRequest.setMessageContent(request.getMessage());
-		messageRequest.addProfileId("SMTP_FS_TCRM1");
-		messageRequest.addProfileId("SMS_FS_TCRM1");
+		messageRequest.addProfileId(messageRequestProperties.getProfileIDS());
 		messageRequest.setPushType(messageRequestProperties.getPushType());
 		messageRequest.setTypeCostumer(messageRequestProperties.getTypeCostumer());
 		messageRequest.setIdMessage(getTraceId());

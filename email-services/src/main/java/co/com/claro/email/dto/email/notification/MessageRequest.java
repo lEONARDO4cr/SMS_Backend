@@ -87,6 +87,20 @@ public class MessageRequest {
 
 	}
 
+	public void addProfileId(List<String> profileids) {
+
+		if (profileids != null && !profileids.isEmpty()) {
+
+			for (String profileid : profileids) {
+
+				this.profileId.add(profileid);
+
+			}
+
+		}
+
+	}
+
 	public void addCommunicationType(String... communicationTypes) {
 
 		if (communicationTypes != null && communicationTypes.length > 0) {
