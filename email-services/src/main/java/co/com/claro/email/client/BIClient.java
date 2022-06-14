@@ -36,7 +36,7 @@ public class BIClient {
 	@Value("${CLIENTBI_PASSWORD_DEFAULT_VALUE:password1}")
 	private String password;
 
-	@Value("${CLIENTBI_URL=http://100.126.21.189:7777/BIZInteractions/Rest/V1.0/BizInteractionsApi/put/}")
+	@Value("${CLIENTBI_URL:http://100.126.21.189:7777/BIZInteractions/Rest/V1.0/BizInteractionsApi/put/}")
 	private String url;
 
 	@Autowired

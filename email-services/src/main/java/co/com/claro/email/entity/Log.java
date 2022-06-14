@@ -31,6 +31,7 @@ public class Log implements Serializable {
 	private String subject;
 
 	private String clientName;
+	private String clientEmail;
 
 	private String asesorDocument;
 	private String asesorCod;

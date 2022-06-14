@@ -102,8 +102,7 @@ public class EmailService {
 		auditLog.setAsesorName(request.getAsesorName());
 		auditLog.setChannel("EMAIL");
 		auditLog.setDocument(request.getClientDocument());
-		auditLog.setEmail(request.getClientEmail());
-		auditLog.setMessage(request.getMessage());
+		auditLog.setClientEmail(request.getEmail());
 		auditLog.setMessage(request.getMessage());
 		auditLog.setSubject(request.getSubject());
 		auditLog.setClientName(request.getClientName());
