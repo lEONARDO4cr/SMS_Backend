@@ -2,10 +2,12 @@ package co.com.claro.sms.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,6 +15,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import co.com.claro.sms.dto.RequestDTO;
+import co.com.claro.sms.dto.RequestDecriptDTO;
 import co.com.claro.sms.dto.RequestEncriptTokenDTO;
 import co.com.claro.sms.dto.ResponseDTO;
 import co.com.claro.sms.exception.BadRequestException;
@@ -33,7 +36,7 @@ public class AppController {
 	@Autowired
 	private SMSServices services;
 
-	@Value("${CARACTER_PERMITIDO_VALUE:170}")
+	@Value("${CARACTER_PERMITIDO_VALUE:172}")
 	private int caracterPermitido;
 
 	@CrossOrigin
@@ -92,6 +95,14 @@ public class AppController {
 			throw new BussinesException(e.getMessage(), e);
 		}
 
+	}
+
+	@PostMapping("/sms/decript")
+	@ApiOperation(value = "Desencripta un token dado", produces = MediaType.APPLICATION_JSON_VALUE)
+	public String decryptToken(@RequestBody RequestDecriptDTO token, @RequestHeader("secretKey") String secretKey)
+			throws Exception {
+
+		return AESUtil.decrypt(token.getToken(), secretKey);
 	}
 
 }

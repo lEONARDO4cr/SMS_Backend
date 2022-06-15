@@ -43,9 +43,9 @@ data:
   CLIENTBI_SYSTEM_DEFAULT_VALUE: "Vista360"
   CLIENTBI_GETOPERATION_DEFAULT_VALUE: "setPresencialBizInteraction"
   SPRING_MVC_PATHMATCH_MATCHING_STRATEGY: "ANT_PATH_MATCHER"
-  MONGODB_TYPE_AUTH: "admin"
-  MONGODB_DATABASE: "biz_collection_prodM78"
-  MONGODB_URI: "mongodb://ODI_OMN_SINCMONGO:vmFGOTjllAgedpj9@pl-1-eastus2-azure.u0tys.mongodb.net:1024,pl-1-eastus2-azure.u0tys.mongodb.net:1025,pl-1-eastus2-azure.u0tys.mongodb.net:1026/?ssl=true&replicaSet=atlas-m3p2tp-shard-0"
+  SPRING_DATA_MONGODB_NAME: "admin"
+  SPRING_DATA_MONGODB_DATABASE: "biz_collection_prodM78"
+  SPRING_DATA_MONGODB_URI: "mongodb://ODI_OMN_SINCMONGO:vmFGOTjllAgedpj9@pl-1-eastus2-azure.u0tys.mongodb.net:1024,pl-1-eastus2-azure.u0tys.mongodb.net:1025,pl-1-eastus2-azure.u0tys.mongodb.net:1026/?ssl=true&replicaSet=atlas-m3p2tp-shard-0"
   
 ---
 apiVersion: v1

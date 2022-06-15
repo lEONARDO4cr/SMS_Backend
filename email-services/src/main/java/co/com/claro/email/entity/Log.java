@@ -11,7 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Document("OMN_LOGS_SMS")
+@Document("OMN_LOGS_SMS_EMAIL")
 @NoArgsConstructor
 public class Log implements Serializable {
 
