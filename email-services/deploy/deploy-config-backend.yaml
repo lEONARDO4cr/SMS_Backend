@@ -7,7 +7,7 @@ metadata:
     description: MS Ordenes pve api 
     tags: instalacion,install,java,springboot,pipeline,deploy
     iconClass: icon-spring
-    openshift.io/long-description: Este servicio envia un mensaje de texto al cliente
+    openshift.io/long-description: Este servicio envia un mensaje de correo al cliente
     openshift.io/provider-display-name: Red Hat, Inc.
     template.openshift.io/bindable: 'false'
 message: |-
@@ -194,6 +194,8 @@ objects:
                   value: '#{Template.MESSAGE_REQUEST_DELIVERYRECEIPTS}#'
                 - name: 'MESSAGE_REQUEST_TYPECOSTUMER'
                   value: '#{Template.MESSAGE_REQUEST_TYPECOSTUMER}#'
+                - name: 'MESSAGE_REQUEST_PROFILEID'
+                  value: '#{Template.MESSAGE_REQUEST_PROFILEID}#'
                   
 
   - apiVersion: autoscaling/v1
@@ -290,4 +292,4 @@ parameters:
     displayName: Spring profile active
     description: Spring profile active.
     required: true
-    value: '#{Template.TZ}#'
+    value: '#{Template.TZ}#'    
