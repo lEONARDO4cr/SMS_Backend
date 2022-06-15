@@ -5,7 +5,6 @@ import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,7 +14,6 @@ import co.com.claro.email.dto.RequestDTO;
 import co.com.claro.email.dto.ResponseDTO;
 import co.com.claro.email.exception.BadRequestException;
 import co.com.claro.email.service.EmailService;
-import co.com.claro.email.util.AESUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -56,13 +54,6 @@ public class AppController {
 			watch.stop();
 			log.info("[[END]] el servicio tardo: {}", watch.getTotalTimeMillis());
 		}
-
-	}
-
-	public String decryptToken(@RequestHeader("token") String token, @RequestHeader("secretKey") String secretKey)
-			throws Exception {
-
-		return AESUtil.decrypt(token, secretKey);
 
 	}
 
